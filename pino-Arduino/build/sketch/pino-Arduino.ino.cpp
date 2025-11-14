@@ -339,40 +339,42 @@ void processCommand(String cmd) {
 
 
 void processJoystick(String cmd) {
-  // Example command: "1.00:-1.00:0.50"
+  // Example command: "1.00:0.80:1.00"
   
   cmd.trim();  // Remove whitespace
   
-  int colon1 = cmd.indexOf(':');  // Get index of separator (:)
+  int colon1 = cmd.indexOf(':');
   int colon2 = cmd.indexOf(':', colon1 + 1);
 
   float linearX = cmd.substring(0, colon1).toFloat();
   float angularZ = cmd.substring(colon1 + 1, colon2).toFloat();
   float dpad_H = cmd.substring(colon2 + 1).toFloat();
   
-  int scale = 8;
+  int headturn_speed = 4;
   float linearX_deadzone = 0.40;
   float angularZ_deadzone = 0.40;
 
   // Turn Head
-  if (dpad_H > 0 + linearX_deadzone) {
+  if (dpad_H != 0) {
     int position = myservo.read();
-    position = position + (scale * linearX);
+    position = position + (headturn_speed * dpad_H);
     myservo.write(position);
   }
-
+ 
   if (linearX > 0 + linearX_deadzone) {
     advance();
   }
-    else if (linearX < 0 - linearX_deadzone) {
+  else if (linearX < 0 - linearX_deadzone) {
     back();
   }
-
-  if (angularZ > 0 + angularZ_deadzone) {
+  else if (angularZ > 0 + angularZ_deadzone) {
     turnL();
   }
-    else if (angularZ < 0 - angularZ_deadzone) {
+  else if (angularZ < 0 - angularZ_deadzone) {
     turnR();
+  }
+  else {
+    stopp();
   }
   
   
