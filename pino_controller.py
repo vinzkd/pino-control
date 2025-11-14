@@ -42,20 +42,9 @@ class robot_controller(Node):
 
     def velocity_callback(self, msg): 
 
-        enabled = True
+        self.left_joystick_V = msg.linear.x
+        self.right_joystick_H = msg.angular.z
 
-        if enabled == True:
-
-            self.left_joystick_V = msg.linear.x
-            self.right_joystick_H = msg.angular.z
-
-            if self.right_joystick_H != 0:
-                command_string = f'joystick_turn:{self.right_joystick_H:.2f}'
-                send_command(command_string)
-
-            if self.left_joystick_V != 0:
-                command_string = f'joystick_move:{self.left_joystick_V:.2f}'
-                send_command(command_string)
 
     def joy_callback(self, msg):  # Grab output of /joy message
 
@@ -79,7 +68,10 @@ class robot_controller(Node):
 
 
     def main_loop(self):
-        self.get_logger().info( f"{self.left_joystick_V:.2f}:{self.right_joystick_H:.2f}:{self.dpad_H}" )
+        command_string = f"{self.left_joystick_V:.2f}:{self.right_joystick_H:.2f}:{self.dpad_H}" 
+        send_command(command_string)
+
+        self.get_logger().info( command_string )
 
 
 
