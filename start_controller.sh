@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 ~/ros_/motor_controller.py
+python3 ./pino_controller.py
