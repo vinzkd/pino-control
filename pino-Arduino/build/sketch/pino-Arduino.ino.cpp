@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#line 1 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
 #include <Servo.h>
 #define Lpwm_pin 5 // pin of controlling speed---- ENA of motor driver board
 #define Rpwm_pin 6 // pin of controlling speed---- ENB of motor driver board
@@ -14,6 +16,33 @@ String command = "";
 bool manualMode = false;
 
 
+#line 17 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+float checkdistance();
+#line 28 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void Detect_obstacle_distance();
+#line 41 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void setup();
+#line 60 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void loop();
+#line 182 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void Set_Speed(unsigned char pwm);
+#line 187 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void advance();
+#line 194 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void turnR();
+#line 201 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void turnL();
+#line 208 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void stopp();
+#line 215 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void back();
+#line 222 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void shakehead();
+#line 249 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void processCommand(String cmd);
+#line 312 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
+void processJoystick(String cmd);
+#line 17 "/home/vinzk/pino-control/pino-Arduino/pino-Arduino.ino"
 float checkdistance() {
   digitalWrite(A1, LOW);
   delayMicroseconds(2);
@@ -310,47 +339,71 @@ void processCommand(String cmd) {
 
 
 void processJoystick(String cmd) {
-  // Example command: "turn_head_left:1.00"
+  // Example command: "1.00:-1.00:0.50"
   
   cmd.trim();  // Remove whitespace
   
-  char separatorIndex = cmd.indexOf(':');  // Get index of separator (:)
-  String directive = cmd.substring(0, separatorIndex);  // Remove axis value from command
-  float axisValue = cmd.substring(separatorIndex + 1).toFloat();
+  int colon1 = cmd.indexOf(':');  // Get index of separator (:)
+  int colon2 = cmd.indexOf(':', colon1 + 1);
+
+  float linearX = cmd.substring(0, colon1).toFloat();
+  float angularZ = cmd.substring(colon1 + 1, colon2).toFloat();
+  float dpad_H = cmd.substring(colon2 + 1).toFloat();
   
   int scale = 8;
-  float leftX_deadzone = 0.40;
-  float rightZ_deadzone = 0.40;
-  
-  if (directive == "joystick_turn_head") { 
+  float linearX_deadzone = 0.40;
+  float angularZ_deadzone = 0.40;
+
+  // Turn Head
+  if (dpad_H > 0 + linearX_deadzone) {
     int position = myservo.read();
-    position = position + (scale * axisValue);
+    position = position + (scale * linearX);
     myservo.write(position);
   }
 
-  else if (directive == "joystick_move") {
-    if (axisValue > 0 + leftX_deadzone) {
-      advance();
-    }
-    else if (axisValue < 0 - leftX_deadzone) {
-      back();
-    }
-    else {
-      stopp();
-    }
+  if (linearX > 0 + linearX_deadzone) {
+    advance();
+  }
+    else if (linearX < 0 - linearX_deadzone) {
+    back();
   }
 
-  else if (directive == "joystick_turn") {
-    if (axisValue > 0 + rightZ_deadzone) {
-      turnL();
-    }
-    else if (axisValue < 0 - rightZ_deadzone) {
-      turnR();
-    }
-    else {
-      stopp();
-    }
+  if (angularZ > 0 + angularZ_deadzone) {
+    turnL();
+  }
+    else if (angularZ < 0 - angularZ_deadzone) {
+    turnR();
   }
   
-
+  
+  // if (directive == "joystick_turn_head") { 
+  //   int position = myservo.read();
+  //   position = position + (scale * axisValue);
+  //   myservo.write(position);
+  // }
+  //
+  // else if (directive == "joystick_move") {
+  //   if (axisValue > 0 + leftX_deadzone) {
+  //     advance();
+  //   }
+  //   else if (axisValue < 0 - leftX_deadzone) {
+  //     back();
+  //   }
+  //   else {
+  //     stopp();
+  //   }
+  // }
+  //
+  // else if (directive == "joystick_turn") {
+  //   if (axisValue > 0 + rightZ_deadzone) {
+  //     turnL();
+  //   }
+  //   else if (axisValue < 0 - rightZ_deadzone) {
+  //     turnR();
+  //   }
+  //   else {
+  //     stopp();
+  //   }
+  // }
 }
+
