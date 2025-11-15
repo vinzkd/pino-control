@@ -1,3 +1,5 @@
 #!/bin/bash
 
-python3 ./pino_controller.py
+echo "orange123" | sudo chown ubuntu:ubuntu /dev/ttyACM0
+
+python3 /home/ubuntu/pino-control/pino_controller.py
